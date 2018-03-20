@@ -1,0 +1,25 @@
+{
+  "name": "testReason",
+  "namespace": true,
+  "sources": {
+    "dir": "src",
+    "subdirs": true
+  },
+  "reason": {
+    "react-jsx": 2
+  },
+  "refmt": 3,
+  "package-specs": {
+    "module": "commonjs",
+    "in-source": true
+  },
+  "suffix": ".bs.js",
+
+  "bs-dependencies": [
+    "bs-express"
+  ],
+  "warnings": {
+    "error": "+5"
+  }
+
+}

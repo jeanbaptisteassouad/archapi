@@ -1,0 +1,23 @@
+{
+  "name": "testReason",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "buildDev": "webpack --progress --mode development",
+    "buildProd": "webpack --progress --mode production",
+    "devServer": "webpack-dev-server --mode development",
+    "bsb": "bsb -make-world",
+    "watchBuildDev": "webpack --watch --progress --mode development",
+    "node": "node ./src/App.bs.js",
+    "start": ""
+  },
+  "author": "",
+  "devDependencies": {
+    "bs-platform": "^2.2.2"
+  },
+  "dependencies": {
+    "bs-express": "^0.5.0"
+  }
+}
