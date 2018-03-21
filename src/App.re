@@ -1,7 +1,6 @@
 
 open Express;
 
-
 let getDictString = (dict, key) =>
   switch (Js.Dict.get(dict, key)) {
   | Some(json) => Js.Json.decodeString(json)
@@ -34,11 +33,20 @@ module Cpt = {
 
 let app = express();
 
+let printDb = () => Database.getState()
+                 |> State.toJson
+                 |> Js.Json.stringify;
 
-App.get(app, ~path="/get") @@
+App.get(app, ~path="/:user_name") @@
 Middleware.from(
   (next, req, resp) =>
-    Response.sendString("zefzefze",resp)
+    switch(getDictString(Request.params(req),"user_name")) {
+      | Some(user_name) =>
+          Database.dispatch(Database.AddUser(
+            User.create(user_name)));
+          Response.sendString(printDb(),resp)
+      | None => Response.sendStatus(Response.StatusCode.Unauthorized,resp)
+    }
 );
 
 

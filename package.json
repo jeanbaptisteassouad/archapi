@@ -15,9 +15,9 @@
   },
   "author": "",
   "devDependencies": {
-    "bs-platform": "^2.2.2"
+    "bs-platform": "2.2.2"
   },
   "dependencies": {
-    "bs-express": "^0.5.0"
+    "bs-express": "0.5.0"
   }
 }
