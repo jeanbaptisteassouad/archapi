@@ -10,8 +10,10 @@ COPY package*.json ./
 
 RUN yarn install
 
+Run ./node_modules/.bin/nsp check
+
 COPY . .
 
 RUN npm run-script bsb
 
-CMD ["npm", "run-script", "node"]
+CMD ["npm", "run-script", "node", "--", "./src/app.js"]

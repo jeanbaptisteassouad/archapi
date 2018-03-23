@@ -1,14 +1,26 @@
 
 type t = {
-  users:list(User.t)
+  users: list(User.t),
 };
 
 let create = () => {users:[]};
 
-let addUser = (user,state) => {
-  ...state,
-  users:[user, ...state.users]
+let getUserByName = (user_name, s) => {
+  switch (List.filter(u => User.hasName(user_name,u), s.users)) {
+    | [] => None
+    | [u, ...us] => Some(u)
+  }
 };
+
+
+let addUser = (user,state) => 
+  switch (getUserByName(User.getName(user), state)) {
+    | Some(_) => state
+    | None => {
+        ...state,
+        users:[user, ...state.users]
+      }
+  };
 
 let removeUsersByName = (user_name,state) => {
   ...state,
@@ -33,3 +45,5 @@ let toJson = (s) => {
   Js.Dict.set(d, "users", Js.Json.array(array));
   Js.Json.object_(d);
 };
+
+

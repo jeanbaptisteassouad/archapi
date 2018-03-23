@@ -1,5 +1,9 @@
-
+/*
 open Express;
+
+
+external myCFunction : int => string = "theCFunction";
+
 
 let getDictString = (dict, key) =>
   switch (Js.Dict.get(dict, key)) {
@@ -43,7 +47,7 @@ Middleware.from(
     switch(getDictString(Request.params(req),"user_name")) {
       | Some(user_name) =>
           Database.dispatch(Database.AddUser(
-            User.create(user_name)));
+            User.create(user_name,{salt:"",hash:""})));
           Response.sendString(printDb(),resp)
       | None => Response.sendStatus(Response.StatusCode.Unauthorized,resp)
     }
@@ -72,6 +76,38 @@ let onListen = (port, e) =>
   };
 
 App.listen(app, ~onListen=onListen(3000), ());
+*/
 
+
+let createUser = (user_name, salt, hash) =>
+  Js.Promise.make((~resolve, ~reject) => {
+    Database.dispatch(Database.AddUser(
+      User.create(user_name, {salt,hash})));
+    resolve(. Js.Nullable.null);
+  });
+/*
+let checkUser = (user_name, hash) => {
+  let state = Database.getState();
+  switch (State.getUserByName(user_name, state)) {
+    | Some(u) => Js.Boolean.to_js_boolean(User.checkCred(hash, u))
+    | None => Js.false_
+  };
+};
+*/
+
+let doesUserExist = user_name =>
+  Js.Promise.make((~resolve, ~reject) => {
+    let state = Database.getState();
+    switch (State.getUserByName(user_name, state)) {
+      | Some(u) => resolve(. Js.true_)
+      | None => resolve(. Js.false_)
+    };
+  });
+
+let printDb = () =>
+  Js.Promise.make((~resolve, ~reject) => {
+    let ans = Js.Json.stringify @@ State.toJson @@ Database.getState();
+    resolve(. ans);
+  })
 
 
