@@ -42,6 +42,31 @@ router.post('/:user_name', (req, res) => {
 
 
 
+const headerHasAuthorization = (req, res, next) => {
+  const auth = req.get('Authorization')
+  if (auth) {
+    let arr = auth.split(' ')
+    if (arr.length === 2 && arr[0] === 'Bearer' && arr[1] !== "") {
+      res.locals.token = arr[1]
+      next()
+    } else {
+      // 403 Forbidden
+      res.sendStatus(403)
+    }
+  } else {
+    // 403 Forbidden
+    res.sendStatus(403)
+  } 
+}
+
+router.get('/:user_name', headerHasAuthorization)
+
+router.get('/:user_name', (req, res) => {
+  res.send(res.locals.token)
+})
+
+
+
 
 
 
