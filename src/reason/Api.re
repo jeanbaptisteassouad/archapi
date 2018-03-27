@@ -78,15 +78,15 @@ let onListen = (port, e) =>
 App.listen(app, ~onListen=onListen(3000), ());
 */
 
+exception UserDoesNotExist;
 
-let createUser = (user_name, salt, hash) =>
-  Js.Promise.make((~resolve, ~reject) => {
-    Database.dispatch(Database.AddUser(
-      User.create(user_name, {salt,hash})));
-    resolve(. Js.Nullable.null);
-  });
-/*
-let checkUser = (user_name, hash) => {
+let createUser = Customs.c3 @@ (user_name, salt, hash) => {
+  Database.dispatch(Database.AddUser(
+    User.create(user_name, {salt,hash})));
+  Js.Nullable.null;
+};
+
+/*let checkUser = Customs.c2 @@ (user_name, hash) => {
   let state = Database.getState();
   switch (State.getUserByName(user_name, state)) {
     | Some(u) => Js.Boolean.to_js_boolean(User.checkCred(hash, u))
@@ -95,19 +95,25 @@ let checkUser = (user_name, hash) => {
 };
 */
 
-let doesUserExist = user_name =>
-  Js.Promise.make((~resolve, ~reject) => {
-    let state = Database.getState();
-    switch (State.getUserByName(user_name, state)) {
-      | Some(u) => resolve(. Js.true_)
-      | None => resolve(. Js.false_)
-    };
-  });
+let doesUserExist = Customs.c1 @@ user_name => {
+  let state = Database.getState();
+  switch (State.getUserByName(user_name, state)) {
+    | Some(_) => Js.true_
+    | None => Js.false_
+  };
+};
 
-let printDb = () =>
-  Js.Promise.make((~resolve, ~reject) => {
-    let ans = Js.Json.stringify @@ State.toJson @@ Database.getState();
-    resolve(. ans);
-  })
+let getUserSaltAndHash = Customs.c1 @@ user_name => {
+  let state = Database.getState();
+  switch (State.getUserByName(user_name, state)) {
+    | Some(u) => {
+      let {salt,hash} : User.cred = User.getCred(u);
+      {"salt":salt, "hash":hash};
+    }
+    | None => raise(UserDoesNotExist)
+  };
+};
 
-
+let printDb = Customs.c0 @@ () => {
+  Js.Json.stringify @@ State.toJson @@ Database.getState();
+};

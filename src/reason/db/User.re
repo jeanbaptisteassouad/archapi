@@ -34,6 +34,8 @@ let removeGame = (game,user) => {
 
 let hasName = (name,user) => name === user.name;
 
+let getCred = (user) => user.cred;
+
 let credToJson = cred => {
   let d = Js.Dict.empty();
   Js.Dict.set(d, "salt", Js.Json.string(cred.salt));

@@ -4,7 +4,7 @@ const crypto = require('crypto')
 
 exports.create = (pw) => new Promise((resolve, reject) => {
   let salt = randomGen(64)
-  hash(pw, salt).then(buff => {
+  computeHash(pw, salt).then(buff => {
     resolve({
       salt: salt,
       hash: buffToStr(buff)
@@ -13,7 +13,7 @@ exports.create = (pw) => new Promise((resolve, reject) => {
 })
 
 
-const hash = (pw, salt) => new Promise((resolve, reject) => {
+const computeHash = (pw, salt) => new Promise((resolve, reject) => {
   crypto.pbkdf2(pw, salt, 100000, 512, 'sha512', (err, derivedKey) => {
     if (err) reject(err)
     resolve(derivedKey)
@@ -21,7 +21,7 @@ const hash = (pw, salt) => new Promise((resolve, reject) => {
 })
 
 exports.check = (salt,hash,pw) => new Promise((resolve, reject) => {
-  hash(pw, salt).then(buff => {
+  computeHash(pw, salt).then(buff => {
     resolve(buffToStr(buff) === hash)
   })
 })

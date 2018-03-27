@@ -8,7 +8,7 @@ let create = () => {users:[]};
 let getUserByName = (user_name, s) => {
   switch (List.filter(u => User.hasName(user_name,u), s.users)) {
     | [] => None
-    | [u, ...us] => Some(u)
+    | [u, ..._] => Some(u)
   }
 };
 
@@ -17,13 +17,11 @@ let addUser = (user,state) =>
   switch (getUserByName(User.getName(user), state)) {
     | Some(_) => state
     | None => {
-        ...state,
         users:[user, ...state.users]
       }
   };
 
 let removeUsersByName = (user_name,state) => {
-  ...state,
   users:List.filter(u => !User.hasName(user_name,u), state.users)
 };
 
@@ -33,7 +31,6 @@ let addGameToUsers = (user_name,game,state) => {
     | false => u
   };
   {
-    ...state,
     users:List.map(fmap, state.users)
   }
 };

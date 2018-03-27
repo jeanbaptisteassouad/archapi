@@ -17,3 +17,4 @@ let removeGame : (Game.t,t) => t;
 let hasName : (name,t) => bool;
 let toJson : t => Js.Json.t;
 let checkCred : (hash,t) => bool;
+let getCred : (t) => cred;
