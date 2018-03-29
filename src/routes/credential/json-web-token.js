@@ -1,8 +1,10 @@
 
-const randomGen = require('./random-gen')
 const jwt = require('jsonwebtoken')
+const fs = require('fs')
 
-const secretKey = randomGen(64)
+const secretKey = fs.readFileSync('/run/secrets/archapiJwt',{
+  encoding:'utf8'
+})
 
 const option = {
     algorithm: 'HS512',

@@ -4,6 +4,7 @@ pwd = $(shell pwd)
 all: dev
 	sudo docker run \
 		--network host \
+		--mount type=bind,source=$(pwd)/dummySecret,target=/run/secrets/archapiJwt,readonly \
 		-it \
 		$(image_name)
 
