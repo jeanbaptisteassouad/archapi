@@ -63,8 +63,9 @@ const decodeBearerAuth = (req, res, next) => {
     next()
   })
   .catch(() => {
+    let ms = Math.random()*1000
     // 400 Bad Request
-    res.sendStatus(400)
+    setTimeout(()=>res.sendStatus(400), ms)
   })
 }
 
