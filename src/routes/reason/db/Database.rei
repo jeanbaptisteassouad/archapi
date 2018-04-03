@@ -1,8 +1,7 @@
 
-type action = AddUser(User.t)
-            | RemoveUsersByName(User.name)
-            | AddGameToUsers(User.name, Game.t);
+let addUser : (User.t) => unit;
+let removeUsersByName : (User.name) => unit;
 
 
-let dispatch : action => unit;
-let getState : unit => State.t;
+let getUserByName : (User.name) => option(User.t);
+let toJson : unit => Js.Json.t;
