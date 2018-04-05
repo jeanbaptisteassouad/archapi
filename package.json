@@ -7,21 +7,27 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "bsb": "bsb -make-world",
     "node": "node",
+    "test": "mocha ./**/*.test.js --use_strict",
     "start": ""
   },
   "author": "",
   "devDependencies": {
-    "nsp": "3.2.1",
-    "bs-platform": "2.2.2"
+    // "bs-platform": "2.2.2",
+    "colors": "1.2.1",
+    "chai": "4.1.2",
+    "chai-as-promised": "7.1.1",
+    "chai-http": "4.0.0",
+    "mocha": "5.0.5",
+    "nsp": "3.2.1"
   },
   "dependencies": {
+    // "bs-express": "0.5.0",
     "elasticsearch": "14.2.2",
     "jsonwebtoken": "8.2.0",
     "cookie-session": "2.0.0-beta.3",
     "express-session": "1.15.6",
     "helmet": "3.12.0",
     "elasticsearch": "14.2.1",
-    "express": "4.16.3",
-    "bs-express": "0.5.0"
+    "express": "4.16.3"
   }
 }

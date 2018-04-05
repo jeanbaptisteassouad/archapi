@@ -3,7 +3,7 @@ const express = require('express')
 const password = require('./credential/password')
 const jwt = require('./credential/json-web-token')
 
-const Api = require('./reason/Api.bs.js')
+const Api = require('../api/user.js')('users','regular')
 
 
 const headerHasAuth = (req, res, next) => {
@@ -111,11 +111,15 @@ const userExist = (req, res, next) => {
 const createUser = (req, res) => {
   password.create(res.locals.payload.password)
   .then(({salt, hash}) => Api.createUser(res.locals.payload.user_name, salt, hash))
-  // .then(() => Api.printDb())
-  // .then(str => res.send(str))
-
-  // 201 Created
-  .then(() => res.sendStatus(201))
+  .then(created => {
+    if (created) {
+      // 201 Created
+      res.sendStatus(201)
+    } else {
+      // 409 Conflict
+      res.sendStatus(409)
+    }
+  })
 }
 
 const checkUserPassword = (req, res, next) => {
@@ -145,8 +149,9 @@ const sendToken = (req, res) => {
 }
 
 const forbidden = (req, res) => {
+  let ms = Math.random()*1000
   // 403 Forbidden
-  res.sendStatus(403)
+  setTimeout(()=>res.sendStatus(403), ms)
 }
 
 const router = express.Router()
@@ -173,7 +178,7 @@ router.get(
 const user = require('./user')
 
 router.use(
-  '/users/:user_name',
+  '/us/:user_name',
   headerHasAuth,
   authIsBearer,
   decodeBearerAuth,

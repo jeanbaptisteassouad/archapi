@@ -1,5 +1,5 @@
 
-const randomGen = require('./random-gen')
+const randomGen = require('../../common/random-gen')
 const crypto = require('crypto')
 
 exports.create = (pw) => new Promise((resolve, reject) => {
