@@ -37,10 +37,13 @@ stop:
 
 restart: stop start
 
+
+TPATH = './**/*.test.js'
+
 test: dev
 	sudo docker run \
 		--network host \
 		--mount type=bind,source=$(pwd)/dummySecret,target=/run/secrets/archapiJwt,readonly \
 		-it \
 		$(image_name) \
-		npm test
+		npm test $(TPATH)

@@ -2,12 +2,28 @@
 const express = require('express')
 
 const router = express.Router()
+const makeUserApi = require('../api/user.js')
 
 
-router.get('/', (req, res) => {
-  console.log(res.locals.payload.user_name)
-  res.send(res.locals.token)
-})
+module.exports = (index, type) => {
+
+  const user_api = makeUserApi('user_'+index, type)
 
 
-module.exports = router
+  router.get('/', (req, res) => {
+    res.send(res.locals.token)
+  })
+
+  router.get('/fs', (req, res) => {
+    user_api.getFs(res.locals.payload.user_name)
+    .then(fss => {
+      res.send({
+        fss,
+      })
+    })
+  })
+
+
+  return router
+
+}

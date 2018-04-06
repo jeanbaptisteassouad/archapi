@@ -48,12 +48,49 @@ describe('Api User', function() {
     const salt = randomGen(40)
     const hash = randomGen(40)
 
-    it('should return null when user does exist', function() {
+    it('should return {salt:"",hash:""} when user does not exist', function() {
       return M.getUserSaltAndHash(name).should.eventually.deep.equal({salt:'',hash:''})
     })
     it('should return {salt,hash} when user exist', function() {
       return M.createUser(name,salt,hash)
               .then(() =>  M.getUserSaltAndHash(name).should.eventually.deep.equal({salt,hash}))
     })
+  })
+
+  describe('#pushFs', function() {
+    const M = make()
+    const name = randomGen(40)
+    const salt = randomGen(40)
+    const hash = randomGen(40)
+    const fs_id = randomGen(40)
+
+    it('should return false when user does not exist', function() {
+      return M.pushFs(fs_id,name).should.eventually.equal(false)
+    })
+    it('should return true when user exist', function() {
+      return M.createUser(name,salt,hash)
+              .then(() => M.pushFs(fs_id,name).should.eventually.equal(true))
+    })
+  })
+
+  describe('#getFs', function() {
+    const M = make()
+    const name = randomGen(40)
+    const salt = randomGen(40)
+    const hash = randomGen(40)
+    const fs_id1 = randomGen(40)
+    const fs_id2 = randomGen(40)
+    const fs_id3 = randomGen(40)
+
+    it('should return [] when user does not exist', function() {
+      return M.getFs(name).should.eventually.deep.equal([])
+    })
+    it('should return [...fs] when user exist', function() {
+      return M.createUser(name,salt,hash)
+              .then(() => M.pushFs(fs_id1,name))
+              .then(() => M.pushFs(fs_id2,name))
+              .then(() => M.pushFs(fs_id3,name))
+              .then(() => M.getFs(name).should.eventually.deep.equal([fs_id1,fs_id2,fs_id3]))
+    }).timeout(5000)
   })
 })

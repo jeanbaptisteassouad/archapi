@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "bsb": "bsb -make-world",
     "node": "node",
-    "test": "mocha ./**/*.test.js --use_strict",
+    "test": "mocha --use_strict",
     "start": ""
   },
   "author": "",
