@@ -24,15 +24,13 @@ module.exports = (index) => {
     })
   }
 
-  const read = (req, res) => {
+  const readFs = (req, res, next) => {
     const fs_id = req.params.fs_id
-    const account_name = res.locals.payload.account_name
     fs_api.read(fs_id)
     .then(fs => {
-      if (fs && fs.owner === account_name) {
-        // 200 Ok
-        res.status(200)
-        res.send(fs)
+      if (fs) {
+        res.locals.readFs_fs = fs
+        next()
       } else {
         // 404 Not Found
         res.sendStatus(404)
@@ -40,14 +38,50 @@ module.exports = (index) => {
     })
   }
 
+  const accountIsOwner = (req, res, next) => {
+    const account_name = res.locals.payload.account_name
+    const fs = res.locals.readFs_fs
+    if (fs.owner === account_name) {
+      next()
+    } else {
+      // 404 Not Found
+      res.sendStatus(404)
+    }
+  }
+
+  const sendFs = (req, res, next) => {
+    const fs = res.locals.readFs_fs
+    res.send(fs)
+  }
+
+
+
   router.post(
     '/:fs_id',
     create
   )
 
+  router.use(
+    '/:fs_id',
+    readFs,
+    accountIsOwner
+  )
+
   router.get(
     '/:fs_id',
-    read
+    sendFs
+  )
+
+  router.get(
+    '/:fs_id/*',
+    (req, res) => {
+      const arr = req.path
+        .split('/')
+        .slice(2)
+        .map(e=>req.params.fs_id+e)
+      console.log(arr)
+      res.sendStatus(200)
+    }
   )
 
   return router

@@ -1,6 +1,8 @@
 const elasticsearch = require('elasticsearch')
 const randomGen = require('../common/random-gen')
 const debugLog = require('../common/debug-log')
+const tree = require('../common/tree')
+
 
 const client = elasticsearch.Client({
   host: 'localhost:9200'
@@ -13,6 +15,7 @@ module.exports = (index) => {
   const create = (owner,id) => {
     const body = {
       owner,
+      tree:tree.init(id)
     }
     // debugLog('body :',JSON.stringify(body, null, 2))
     return client.create({
@@ -48,9 +51,41 @@ module.exports = (index) => {
     })
   }
 
+  const push = (path,size,id) => {
+    return read(id)
+    .then(fs => {
+      if (fs) {
+        const body = {
+          doc: {
+            tree:tree.update(path,size,fs.tree)
+          }
+        }
+        // debugLog('body :',JSON.stringify(body, null, 2))
+        client.update({
+          index,
+          type,
+          id,
+          refresh:'wait_for',
+          body
+        })
+        .then(res => {
+          // debugLog('res :',res)
+          return res._source
+        })
+        .catch(err => {
+          // debugLog('err :',err)
+          return null
+        })
+      } else {
+        return null
+      }
+    })
+  }
+
   return {
     create,
-    read
+    read,
+    push
   }
   
 }

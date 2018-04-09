@@ -5,6 +5,7 @@ const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
 const expect = chai.expect
 
+const tree = require('../common/tree')
 
 const express = require('express')
 const makeFs = require('./fs')
@@ -69,7 +70,10 @@ describe('Fs Routes', function() {
       .end((err, res) => {
         expect(err).to.be.null
         expect(res).to.have.status(200)
-        expect(res.body).to.deep.equal({owner:'swagy'})
+        expect(res.body).to.deep.equal({
+          owner:'swagy',
+          tree:tree.init(fs_id)
+        })
         done()
       })
     }).timeout(5000)

@@ -231,29 +231,6 @@ describe('Account Route', function() {
       200
     )
 
-
-    // it('should return Forbidden (403) when token give access right to resource', function(done) {
-    //   const app = makeApp()
-    //   const auth = 'Basic '+Buffer.from('user:pass').toString('base64')
-    //   createUser(auth,app)
-    //   .end((err, res) => {
-    //     expect(err).to.be.null
-    //     getToken(auth,app)
-    //     .end((err, res) => {
-    //       expect(err).to.be.null
-    //       const token = res.body.token
-    //       chai.request(app)
-    //       .get('/us/wronguser')
-    //       .set('Authorization', 'Bearer '+token)
-    //       .end((err, res) => {
-    //         expect(err).to.be.null
-    //         expect(res).to.have.status(403)
-    //         done()
-    //       })
-    //     })
-    //   })
-    // }).timeout(5000)
-
   })
 
 })

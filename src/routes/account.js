@@ -5,7 +5,6 @@ const jwt = require('./credential/json-web-token')
 
 const makeAccountApi = require('../api/account.js')
 
-// const user = require('./user')
 const fs = require('./fs')
 
 
@@ -157,19 +156,6 @@ module.exports = (index) => {
     setTimeout(()=>res.sendStatus(403),ms)
   }
 
-  // const checkTokenAccessRight = (req, res, next) => {
-  //   if (
-  //     req.params.user_name &&
-  //     res.locals.payload.user_name === req.params.user_name
-  //   ) {
-  //     next()
-  //   } else {
-  //     // 403 Forbidden
-  //     res.sendStatus(403)
-  //   }
-  // }
-
-
   const router = express.Router()
 
   router.use(
@@ -202,7 +188,6 @@ module.exports = (index) => {
   )
 
   router.use('/bearer/fs', fs(index))
-  // router.use('/bearer', user)
 
   router.use('*', forbidden)
 

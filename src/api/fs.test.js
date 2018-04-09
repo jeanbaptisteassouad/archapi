@@ -1,17 +1,19 @@
 const chai = require("chai")
 const chaiAsPromised = require("chai-as-promised")
- 
+
 chai.use(chaiAsPromised)
 const should = chai.should()
 
 
+
+const tree = require('../common/tree')
 const randomGen = require('../common/random-gen')
 const make = () => {
   const index = Math.floor(Math.random() * 255000)
   return require('./fs')(index)
 }
 
-describe('Api Fs', function() {
+describe('Fs Api', function() {
   describe('#create', function() {
     const M = make()
     const id = randomGen(40)
@@ -35,7 +37,24 @@ describe('Api Fs', function() {
     })
     it('should return fs when it exist', function() {
       return M.create(owner,id)
-              .then(() => M.read(id).should.eventually.deep.equal({owner}))
+              .then(() => M.read(id).should.eventually.deep.equal({
+                owner,
+                tree:tree.init(id)
+              }))
     })
   })
+
+  // describe('#push', function() {
+  //   const M = make()
+  //   const id = randomGen(40)
+  //   const owner = randomGen(40)
+
+  //   it('should return null when fs does not exist', function() {
+  //     return M.read(id).should.eventually.equal(null)
+  //   })
+  //   it('should return fs when it exist', function() {
+  //     return M.create(owner,id)
+  //             .then(() => M.push([id,'baba','coco'],1203,id).should.eventually.deep.equal({owner}))
+  //   })
+  // })
 })
