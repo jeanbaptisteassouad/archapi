@@ -5,9 +5,9 @@ const router = express.Router()
 const makeUserApi = require('../api/user.js')
 
 
-module.exports = (index, type) => {
+module.exports = (index) => {
 
-  const user_api = makeUserApi('user_'+index, type)
+  const user_api = makeUserApi('user_'+index)
 
 
   router.get('/', (req, res) => {

@@ -2,7 +2,7 @@ const express = require('express')
 
 const helmet = require('helmet')
 
-const account = require('./routes/account')('users','regular')
+const account = require('./routes/account')('alpha')
 
 const app = express()
 

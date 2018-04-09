@@ -7,9 +7,10 @@ const client = elasticsearch.Client({
 })
 
 
-module.exports = (index, type) => {
+module.exports = (index) => {
+  const type = 't'
   
-  const createFs = (owner,id) => {
+  const create = (owner,id) => {
     const body = {
       owner,
     }
@@ -31,8 +32,25 @@ module.exports = (index, type) => {
     })
   }
 
+  const read = (id) => {
+    return client.get({
+      index,
+      type,
+      id,
+    })
+    .then(res => {
+      // debugLog('res :',res)
+      return res._source
+    })
+    .catch(err => {
+      // debugLog('err :',err)
+      return null
+    })
+  }
+
   return {
-    createFs,
+    create,
+    read
   }
   
 }

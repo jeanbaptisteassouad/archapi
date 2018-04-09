@@ -2,17 +2,16 @@ const express = require('express')
 
 const password = require('./credential/password')
 const jwt = require('./credential/json-web-token')
-const makeUserApi = require('../api/user.js')
-const makeFsApi = require('../api/fs.js')
 
-const randomGen = require('../common/random-gen')
+const makeAccountApi = require('../api/account.js')
 
-const user = require('./user')
+// const user = require('./user')
+const fs = require('./fs')
 
-module.exports = (index, type) => {
 
-  const user_api = makeUserApi('user_'+index, type)
-  const fs_api = makeFsApi('fs_'+index, type)
+module.exports = (index) => {
+
+  const account_api = makeAccountApi('account_'+index)
 
   const headerHasAuth = (req, res, next) => {
     const auth = req.get('Authorization')
@@ -42,7 +41,7 @@ module.exports = (index, type) => {
                           .split(':')
     if (decoded.length === 2 && decoded[0] !== '' && decoded[1] !== '') {
       res.locals.payload = {
-        user_name: decoded[0],
+        account_name: decoded[0],
         password: decoded[1],
       }
       next()
@@ -52,6 +51,14 @@ module.exports = (index, type) => {
     }
   }
 
+  const okIfLeaf = (req, res, next) => {
+    if (req.path === '/') {
+      // 200 Ok
+      res.sendStatus(200)
+    } else {
+      next()
+    }
+  }
 
   const authIsBearer = (req, res, next) => {
     const arr = res.locals.auth.split(' ')
@@ -77,22 +84,10 @@ module.exports = (index, type) => {
     })
   }
 
-  const checkTokenAccessRight = (req, res, next) => {
-    if (
-      req.params.user_name &&
-      res.locals.payload.user_name === req.params.user_name
-    ) {
-      next()
-    } else {
-      // 403 Forbidden
-      res.sendStatus(403)
-    }
-  }
 
 
-
-  const userDoesNotExist = (req, res, next) => {
-    user_api.doesUserExist(res.locals.payload.user_name)
+  const accountDoesNotExist = (req, res, next) => {
+    account_api.exist(res.locals.payload.account_name)
     .then(exist => {
       if (exist) {
         // 409 Conflict
@@ -103,8 +98,8 @@ module.exports = (index, type) => {
     })
   }
 
-  const userExist = (req, res, next) => {
-    user_api.doesUserExist(res.locals.payload.user_name)
+  const accountExist = (req, res, next) => {
+    account_api.exist(res.locals.payload.account_name)
     .then(exist => {
       if (exist) {
         next()
@@ -116,9 +111,9 @@ module.exports = (index, type) => {
   }
 
 
-  const createUser = (req, res) => {
+  const createAccount = (req, res) => {
     password.create(res.locals.payload.password)
-    .then(({salt, hash}) => user_api.createUser(res.locals.payload.user_name, salt, hash))
+    .then(({salt, hash}) => account_api.create(res.locals.payload.account_name, salt, hash))
     .then(created => {
       if (created) {
         // 201 Created
@@ -130,8 +125,8 @@ module.exports = (index, type) => {
     })
   }
 
-  const checkUserPassword = (req, res, next) => {
-    user_api.getUserSaltAndHash(res.locals.payload.user_name)
+  const checkAccountPassword = (req, res, next) => {
+    account_api.saltAndHash(res.locals.payload.account_name)
     .then(({salt,hash}) => password.check(salt, hash, res.locals.payload.password))
     .then(match => {
       if (match) {
@@ -146,7 +141,7 @@ module.exports = (index, type) => {
 
   const sendToken = (req, res) => {
     const payload = {
-      user_name:res.locals.payload.user_name,
+      account_name:res.locals.payload.account_name,
     }
     jwt.create(payload)
     .then(token => {
@@ -162,66 +157,52 @@ module.exports = (index, type) => {
     setTimeout(()=>res.sendStatus(403),ms)
   }
 
-  const createFs = (req, res) => {
-    const fs_id = req.params.fs_id
-    if (fs_id) {
-      fs_api.createFs(res.locals.payload.user_name, fs_id)
-      .then(created => {
-        if (created) {
-          user_api.pushFs(fs_id, res.locals.payload.user_name)
-          .then(pushed => {
-            // 201 Created
-            res.sendStatus(201)
-          })
-        } else {
-          // 409 Conflict
-          res.sendStatus(409)
-        }
-      })
-    } else {
-      // 400 Bad Request
-      res.sendStatus(400) 
-    }
-  }
+  // const checkTokenAccessRight = (req, res, next) => {
+  //   if (
+  //     req.params.user_name &&
+  //     res.locals.payload.user_name === req.params.user_name
+  //   ) {
+  //     next()
+  //   } else {
+  //     // 403 Forbidden
+  //     res.sendStatus(403)
+  //   }
+  // }
+
 
   const router = express.Router()
 
-  router.post(
-    '/',
+  router.use(
+    '/basic',
     headerHasAuth,
     authIsBasic,
     decodeBasicAuth,
-    userDoesNotExist,
-    createUser
+    okIfLeaf
+  )
+
+  router.post(
+    '/basic/account',
+    accountDoesNotExist,
+    createAccount
   )
 
   router.get(
-    '/',
-    headerHasAuth,
-    authIsBasic,
-    decodeBasicAuth,
-    userExist,
-    checkUserPassword,
+    '/basic/account',
+    accountExist,
+    checkAccountPassword,
     sendToken
   )
 
-
   router.use(
-    '/us/:user_name',
+    '/bearer',
     headerHasAuth,
     authIsBearer,
     decodeBearerAuth,
-    checkTokenAccessRight,
-    user(index, type)
+    okIfLeaf
   )
 
-  router.post(
-    '/fs/:fs_id',
-    headerHasAuth,
-    authIsBearer,
-    decodeBearerAuth,
-    createFs
-  )
+  router.use('/bearer/fs', fs(index))
+  // router.use('/bearer', user)
 
   router.use('*', forbidden)
 
