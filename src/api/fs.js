@@ -55,13 +55,14 @@ module.exports = (index) => {
     return read(id)
     .then(fs => {
       if (fs) {
+        tree.update([id].concat(path),size,fs.tree)
         const body = {
           doc: {
-            tree:tree.update(path,size,fs.tree)
+            tree:fs.tree
           }
         }
         // debugLog('body :',JSON.stringify(body, null, 2))
-        client.update({
+        return client.update({
           index,
           type,
           id,
@@ -70,14 +71,14 @@ module.exports = (index) => {
         })
         .then(res => {
           // debugLog('res :',res)
-          return res._source
+          return res.result === 'updated'
         })
         .catch(err => {
           // debugLog('err :',err)
-          return null
+          return false
         })
       } else {
-        return null
+        return false
       }
     })
   }

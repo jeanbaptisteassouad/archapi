@@ -44,17 +44,26 @@ describe('Fs Api', function() {
     })
   })
 
-  // describe('#push', function() {
-  //   const M = make()
-  //   const id = randomGen(40)
-  //   const owner = randomGen(40)
+  describe('#push', function() {
+    const M = make()
+    const id = randomGen(40)
+    const owner = randomGen(40)
 
-  //   it('should return null when fs does not exist', function() {
-  //     return M.read(id).should.eventually.equal(null)
-  //   })
-  //   it('should return fs when it exist', function() {
-  //     return M.create(owner,id)
-  //             .then(() => M.push([id,'baba','coco'],1203,id).should.eventually.deep.equal({owner}))
-  //   })
-  // })
+    const path = ['baba','coco']
+    const size = 1203
+    const t = tree.init(id)
+    tree.update([id].concat(path),size,t)
+
+    it('should return false when fs does not exist', function() {
+      return M.push(id).should.eventually.equal(false)
+    })
+    it('should return true when it exist', function() {
+      return M.create(owner,id)
+              .then(() => M.push(path,size,id).should.eventually.equal(true))
+              .then(() => M.read(id).should.eventually.deep.equal({
+                owner,
+                tree:t
+              }))
+    }).timeout(5000)
+  })
 })

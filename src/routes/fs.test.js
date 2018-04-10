@@ -99,4 +99,31 @@ describe('Fs Routes', function() {
     }).timeout(5000)
 
   })
+
+
+  // describe('Post /:fs_id/* #push', function() {
+  //   const app = makeApp()
+  //   const swagy_app = app('swagy')
+  //   const fs_id = Math.floor(Math.random() * 255000)
+  //   it('setup test env', function(done) {
+  //     chai.request(swagy_app)
+  //     .post('/'+fs_id)
+  //     .end((err, res) => {
+  //       expect(err).to.be.null
+  //       done()
+  //     })
+  //   })
+
+  //   it('should return Ok (200) when fs exist', function(done) {
+  //     chai.request(swagy_app)
+  //     .post('/'+fs_id+'/test/path/us')
+  //     .end((err, res) => {
+  //       expect(err).to.be.null
+  //       expect(res).to.have.status(200)
+  //       done()
+  //     })
+  //   }).timeout(5000)
+
+  // })
+
 })

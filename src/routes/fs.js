@@ -49,11 +49,29 @@ module.exports = (index) => {
     }
   }
 
-  const sendFs = (req, res, next) => {
+  const sendFs = (req, res) => {
     const fs = res.locals.readFs_fs
     res.send(fs)
   }
 
+
+  const pushPath2Fs = (req, res) => {
+    const size = 100
+    const fs_id = req.params.fs_id
+    const path = req.path
+      .split('/')
+      .slice(2)
+    fs_api.push(path,size,fs_id)
+    .then(pushed => {
+      if (pushed) {
+        // 200 Ok
+        res.sendStatus(200)
+      } else {
+        // 404 Not Found
+        res.sendStatus(404)
+      }
+    })
+  }
 
 
   router.post(
@@ -72,16 +90,9 @@ module.exports = (index) => {
     sendFs
   )
 
-  router.get(
+  router.post(
     '/:fs_id/*',
-    (req, res) => {
-      const arr = req.path
-        .split('/')
-        .slice(2)
-        .map(e=>req.params.fs_id+e)
-      console.log(arr)
-      res.sendStatus(200)
-    }
+    pushPath2Fs
   )
 
   return router
