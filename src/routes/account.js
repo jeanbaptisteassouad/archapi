@@ -6,6 +6,9 @@ const jwt = require('./credential/json-web-token')
 const makeAccountApi = require('../api/account.js')
 
 const fs = require('./fs')
+const log = require('./log')
+
+const intro = require('./introspec')
 
 
 module.exports = (index) => {
@@ -19,8 +22,20 @@ module.exports = (index) => {
       next()
     } else {
       // 400 Bad Request
-      res.sendStatus(400)
-    } 
+      // res.sendStatus(400)
+      intro.send(400,'headerHasAuth',{auth},res)
+    }
+  }
+
+  const headerHasNotAuth = (req, res, next) => {
+    const auth = req.get('Authorization')
+    if (auth) {
+      // 400 Bad Request
+      // res.sendStatus(400)
+      intro.send(400,'headerHasNotAuth',{auth},res)
+    } else {
+      next()
+    }
   }
 
   const authIsBasic = (req, res, next) => {
@@ -30,7 +45,8 @@ module.exports = (index) => {
       next()
     } else {
       // 400 Bad Request
-      res.sendStatus(400)
+      // res.sendStatus(400)
+      intro.send(400,'authIsBasic',{arr},res)
     }
   }
 
@@ -46,7 +62,8 @@ module.exports = (index) => {
       next()
     } else {
       // 400 Bad Request
-      res.sendStatus(400)
+      // res.sendStatus(400)
+      intro.send(400,'decodeBasicAuth',{decoded},res)
     }
   }
 
@@ -66,7 +83,8 @@ module.exports = (index) => {
       next()
     } else {
       // 400 Bad Request
-      res.sendStatus(400)
+      // res.sendStatus(400)
+      intro.send(400,'authIsBearer',{arr},res)
     }
   }
 
@@ -79,18 +97,21 @@ module.exports = (index) => {
     .catch(() => {
       let ms = Math.random()*1000
       // 400 Bad Request
-      setTimeout(()=>res.sendStatus(400), ms)
+      // setTimeout(()=>res.sendStatus(400), ms)
+      setTimeout(()=>intro.send(400,'decodeBearerAuth',{token:res.locals.token},res), ms)
     })
   }
 
 
 
   const accountDoesNotExist = (req, res, next) => {
-    account_api.exist(res.locals.payload.account_name)
+    const account_name = res.locals.payload.account_name
+    account_api.exist(account_name)
     .then(exist => {
       if (exist) {
         // 409 Conflict
-        res.sendStatus(409)
+        // res.sendStatus(409)
+        intro.send(409,'accountDoesNotExist',{account_name},res)
       } else {
         next()
       }
@@ -98,42 +119,50 @@ module.exports = (index) => {
   }
 
   const accountExist = (req, res, next) => {
-    account_api.exist(res.locals.payload.account_name)
+    const account_name = res.locals.payload.account_name
+    account_api.exist(account_name)
     .then(exist => {
       if (exist) {
         next()
       } else {
         // 400 Bad Request
-        res.sendStatus(400) 
+        // res.sendStatus(400)
+        intro.send(400,'accountExist',{account_name},res)
       }
     })
   }
 
 
   const createAccount = (req, res) => {
-    password.create(res.locals.payload.password)
-    .then(({salt, hash}) => account_api.create(res.locals.payload.account_name, salt, hash))
+    const account_name = res.locals.payload.account_name
+    const pswd = res.locals.payload.password
+    password.create(pswd)
+    .then(({salt, hash}) => account_api.create(account_name, salt, hash))
     .then(created => {
       if (created) {
         // 201 Created
         res.sendStatus(201)
       } else {
         // 409 Conflict
-        res.sendStatus(409)
+        // res.sendStatus(409)
+        intro.send(409,'createAccount',{account_name,pswd},res)
       }
     })
   }
 
   const checkAccountPassword = (req, res, next) => {
-    account_api.saltAndHash(res.locals.payload.account_name)
-    .then(({salt,hash}) => password.check(salt, hash, res.locals.payload.password))
+    const account_name = res.locals.payload.account_name
+    const pswd = res.locals.payload.password
+    account_api.saltAndHash(account_name)
+    .then(({salt,hash}) => password.check(salt, hash, pswd))
     .then(match => {
       if (match) {
         next()
       } else {
         let ms = Math.random()*1000
         // 403 Forbidden
-        setTimeout(()=>res.sendStatus(403), ms)
+        // setTimeout(()=>res.sendStatus(403), ms)
+        setTimeout(()=>intro.send(403,'checkAccountPassword',{account_name,pswd},res), ms)
       }
     })
   }
@@ -153,8 +182,11 @@ module.exports = (index) => {
   const forbidden = (req, res) => {
     let ms = Math.random()*1000
     // 403 Forbidden
-    setTimeout(()=>res.sendStatus(403),ms)
+    // setTimeout(()=>res.sendStatus(403),ms)
+    setTimeout(()=>intro.send(403,'forbidden',{path:req.path},res), ms)
   }
+
+
 
   const router = express.Router()
 
@@ -187,7 +219,14 @@ module.exports = (index) => {
     okIfLeaf
   )
 
+  router.use(
+    '/none',
+    headerHasNotAuth,
+    okIfLeaf
+  )
+
   router.use('/bearer/fs', fs(index))
+  router.use('/none/log', log(index))
 
   router.use('*', forbidden)
 

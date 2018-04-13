@@ -5,6 +5,9 @@ const debugLog = require('../common/debug-log')
 const makeFsApi = require('../api/fs.js')
 
 
+const intro = require('./introspec')
+
+
 module.exports = (index) => {
   const router = express.Router()
   const fs_api = makeFsApi('fs_'+index)
@@ -19,7 +22,8 @@ module.exports = (index) => {
         res.sendStatus(201)
       } else {
         // 409 Conflict
-        res.sendStatus(409)
+        // res.sendStatus(409)
+        intro.send(409,'create',{fs_id,account_name},res)
       }
     })
   }
@@ -33,7 +37,8 @@ module.exports = (index) => {
         next()
       } else {
         // 404 Not Found
-        res.sendStatus(404)
+        // res.sendStatus(404)
+        intro.send(404,'readFs',{fs_id},res)
       }
     })
   }
@@ -45,7 +50,8 @@ module.exports = (index) => {
       next()
     } else {
       // 404 Not Found
-      res.sendStatus(404)
+      // res.sendStatus(404)
+      intro.send(404,'accountIsOwner',{account_name},res)
     }
   }
 
@@ -56,7 +62,7 @@ module.exports = (index) => {
 
 
   const pushPath2Fs = (req, res) => {
-    const size = 100
+    const size = 1
     const fs_id = req.params.fs_id
     const path = req.path
       .split('/')
@@ -68,7 +74,8 @@ module.exports = (index) => {
         res.sendStatus(200)
       } else {
         // 404 Not Found
-        res.sendStatus(404)
+        // res.sendStatus(404)
+        intro.send(404,'pushPath2Fs',{fs_id,path},res)
       }
     })
   }

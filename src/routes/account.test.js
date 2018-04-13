@@ -233,4 +233,40 @@ describe('Account Route', function() {
 
   })
 
+
+  describe('All /none', function() {
+    it('should return Bad request (400) when auth is in header (Basic)', function(done) {
+      chai.request(makeApp())
+      .get('/none')
+      .set('Authorization', 'Basic egfohzifanio')
+      .end((err, res) => {
+        expect(err).to.be.null
+        expect(res).to.have.status(400)
+        done()
+      })
+    })
+
+    it('should return Bad request (400) when auth is in header (Bearer)', function(done) {
+      chai.request(makeApp())
+      .get('/none')
+      .set('Authorization', 'Bearer egfohzifanio')
+      .end((err, res) => {
+        expect(err).to.be.null
+        expect(res).to.have.status(400)
+        done()
+      })
+    })
+
+    it('should return Ok (200) when auth is not in header', function(done) {
+      chai.request(makeApp())
+      .get('/none')
+      .end((err, res) => {
+        expect(err).to.be.null
+        expect(res).to.have.status(200)
+        done()
+      })
+    })
+
+  })
+
 })

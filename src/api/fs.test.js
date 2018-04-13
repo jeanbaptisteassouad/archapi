@@ -49,13 +49,34 @@ describe('Fs Api', function() {
     const id = randomGen(40)
     const owner = randomGen(40)
 
+    const makeArrOfPath = (num) => {
+      const arr = []
+      for (let i = 0; i < num; i++) {
+        const path = []
+        for (let j = 0; j < 1+Math.floor(Math.random() * 8); j++) {
+          path.push(''+Math.floor(Math.random() * 20))
+        }
+        arr.push(path)
+      }
+      return arr
+    }
+
+    const makeTreeWithAOP = (id,size,aop) => {
+      const t = tree.init(id)
+      aop.forEach(path => tree.update([id].concat(path),size,t))
+      return t
+    }
+
+
     const path = ['baba','coco']
     const size = 1203
-    const t = tree.init(id)
-    tree.update([id].concat(path),size,t)
+    // const t = tree.init(id)
+    // tree.update([id].concat(path),size,t)
+
+    const t = makeTreeWithAOP(id,size,[path])
 
     it('should return false when fs does not exist', function() {
-      return M.push(id).should.eventually.equal(false)
+      return M.push(path,size,id).should.eventually.equal(false)
     })
     it('should return true when it exist', function() {
       return M.create(owner,id)
@@ -65,5 +86,23 @@ describe('Fs Api', function() {
                 tree:t
               }))
     }).timeout(5000)
+
+
+    // it('should handle multiple parallel requests', function() {
+    //   const aop = makeArrOfPath(10)
+    //   const size = 1
+    //   const id = randomGen(40)
+    //   const t = makeTreeWithAOP(id,size,aop)
+
+    //   return M.create(owner,id)
+    //           // .then(() => M.push(path,size,id).should.eventually.equal(true))
+    //           .then(() => Promise.all(aop.map(path => M.push(path,size,id).should.eventually.equal(true))))
+    //           .then(() => M.read(id).should.eventually.deep.equal({
+    //             owner,
+    //             tree:t
+    //           }))
+    // }).timeout(5000)
+
+
   })
 })

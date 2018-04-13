@@ -66,7 +66,7 @@ module.exports = (index) => {
           index,
           type,
           id,
-          refresh:'wait_for',
+          // refresh:'wait_for',
           body
         })
         .then(res => {
