@@ -10,17 +10,17 @@ const client = elasticsearch.Client({
 module.exports = (index) => {
   const type = 't'
   
-  const create = (user_agent, date, stack) => {
+  const create = (user_agent, date, stack, componentStack) => {
     const body = {
       user_agent,
       date,
       stack,
+      componentStack
     }
     // debugLog('body :',JSON.stringify(body, null, 2))
-    return client.create({
+    return client.index({
       index,
       type,
-      id,
       refresh:'wait_for',
       body,
     })
@@ -34,15 +34,24 @@ module.exports = (index) => {
     })
   }
 
-  const read = (id) => {
-    return client.get({
+  const readXError = (nb) => {
+    const body = {
+      sort : [
+        { date : 'desc' },
+      ],
+      query : {
+          match_all : {}
+      },
+      "size" : nb
+    }
+    // debugLog('body :',JSON.stringify(body, null, 2))
+    return client.search({
       index,
-      type,
-      id,
+      body,
     })
     .then(res => {
       // debugLog('res :',res)
-      return res._source
+      return res.hits.hits.map(a => a._source)
     })
     .catch(err => {
       // debugLog('err :',err)
@@ -51,7 +60,8 @@ module.exports = (index) => {
   }
 
   return {
-    create
+    create,
+    readXError
   }
   
 }
