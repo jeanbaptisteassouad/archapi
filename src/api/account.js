@@ -2,38 +2,22 @@ const elasticsearch = require('elasticsearch')
 const randomGen = require('../common/random-gen')
 const debugLog = require('../common/debug-log')
 
+const I = require('./index')
+
 const client = elasticsearch.Client({
   host: 'localhost:9200'
 })
 
+const props = {
+  name: { 'type' : 'keyword' },
+  salt: { 'type' : 'keyword' },
+  hash: { 'type' : 'keyword' },
+}
+
 module.exports = (index) => {
+  // I.ensure(props,index)
+
   const type = 't'
-  // const makeIndex = () => {
-  //   const body = {
-  //     mappings: {
-  //       [type]: {
-  //         properties: {
-  //           name: { "type" : "keyword" },
-  //           salt: { "type" : "keyword" },
-  //           hash: { "type" : "keyword" },
-  //         }
-  //       }
-  //     }
-  //   }
-  //   // debugLog('body :',JSON.stringify(body, null, 2))
-  //   return client.indices.create({
-  //     index,
-  //     body,
-  //   })
-  //   .then(res => {
-  //     // debugLog('res :',res)
-  //     return res
-  //   })
-  //   .catch(err => {
-  //     // debugLog('err :',err)
-  //     return err
-  //   })
-  // }
 
   const create = (name,salt,hash) => {
     const body = {

@@ -5,7 +5,8 @@ const makeLogApi = require('../api/log.js')
 
 module.exports = (index) => {
 
-  const log_api = makeLogApi('log_'+index)
+  const log_error = makeLogApi('log_error'+index)
+  const log_nb_files = makeLogApi('log_nb_files'+index)
 
 
   const router = express.Router()
@@ -15,16 +16,11 @@ module.exports = (index) => {
     const date = Date.now()
     const stack = req.body.stack
     const componentStack = req.body.componentStack
-    // console.log('user_agent', user_agent)
-    // console.log('stack', stack)
-    // console.log('componentStack', componentStack)
-    // console.log('date', date)
-    log_api.create(
+    log_error.create({
       user_agent,
-      date,
       stack,
       componentStack
-    )
+    })
     .then(() => {
       res.sendStatus(201)
     })
@@ -34,29 +30,50 @@ module.exports = (index) => {
     const nb = Number(req.query.nb)
     if (isNaN(nb)) {
       // 400 Bad Request
-      // res.sendStatus(400)
       intro.send(400,'sendError',{nb},res)
     } else {
-      log_api.readXError(nb).then(arr => {
-        // console.log(arr)
+      log_error.readX(nb).then(arr => {
         res.send(arr)
       }).catch(() => {
         // 400 Bad Request
-        // res.sendStatus(400)
         intro.send(400,'sendError',{},res)
       })
     }
   }
 
-  router.post(
-    '/browserError',
-    extractInfo
-  )
+  const receiveNbFiles = (req, res) => {
+    const date = Date.now()
+    const nb_files = req.body.nb_files
+    log_nb_files.create({
+      nb_files,
+    })
+    .then(() => {
+      res.sendStatus(201)
+    })
+  }
 
-  router.get(
-    '/browserError',
-    sendError
-  )
+  const sendNbFiles = (req, res) => {
+    const nb = Number(req.query.nb)
+    if (isNaN(nb)) {
+      // 400 Bad Request
+      intro.send(400,'sendError',{nb},res)
+    } else {
+      log_nb_files.readX(nb).then(arr => {
+        res.send(arr)
+      }).catch(() => {
+        // 400 Bad Request
+        intro.send(400,'sendError',{},res)
+      })
+    }
+  }
+
+  router.route('/browserError')
+        .post(extractInfo)
+        .get(sendError)
+
+  router.route('/nbFiles')
+        .post(receiveNbFiles)
+        .get(sendNbFiles)
 
 
   return router

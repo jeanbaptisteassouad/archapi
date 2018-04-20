@@ -9,14 +9,10 @@ const client = elasticsearch.Client({
 
 module.exports = (index) => {
   const type = 't'
-  
-  const create = (user_agent, date, stack, componentStack) => {
-    const body = {
-      user_agent,
-      date,
-      stack,
-      componentStack
-    }
+
+  const create = (obj) => {
+    const date = Date.now()
+    const body = Object.assign({},obj,{date})
     // debugLog('body :',JSON.stringify(body, null, 2))
     return client.index({
       index,
@@ -34,7 +30,7 @@ module.exports = (index) => {
     })
   }
 
-  const readXError = (nb) => {
+  const readX = (nb) => {
     const body = {
       sort : [
         { date : 'desc' },
@@ -59,9 +55,10 @@ module.exports = (index) => {
     })
   }
 
+
   return {
     create,
-    readXError
+    readX,
   }
   
 }

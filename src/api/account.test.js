@@ -14,6 +14,8 @@ const make = () => {
 describe('Account Api', function() {
   describe('#create', function() {
     const M = make()
+    // it('', () => make().then(m=>M=m))
+
     const name = randomGen(40)
     const salt = randomGen(40)
     const hash = randomGen(40)
@@ -28,6 +30,8 @@ describe('Account Api', function() {
 
   describe('#exist', function() {
     const M = make()
+    // it('', () => make().then(m=>M=m))
+
     const name = randomGen(40)
     const salt = randomGen(40)
     const hash = randomGen(40)
@@ -43,6 +47,8 @@ describe('Account Api', function() {
 
   describe('#saltAndHash', function() {
     const M = make()
+    // it('', () => make().then(m=>M=m))
+    
     const name = randomGen(40)
     const salt = randomGen(40)
     const hash = randomGen(40)
